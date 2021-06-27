@@ -10,7 +10,9 @@ def get_data():
 
 @app.route("/time")
 def hello_world():
-    return jsonify(get_data())
+    response = jsonify(get_data())
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 if __name__ == '__main__':
     app.run()
