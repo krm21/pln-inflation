@@ -1,7 +1,34 @@
 import React, { useState, useEffect} from 'react'
 import ReactDOM from 'react-dom'
+import { DateChooser } from './DateChooser'
 
 function Converter(){}
+
+const monthLocative = ["styczniu", 
+                       "lutym", 
+                       "marcu", 
+                       "kwietniu", 
+                       "maju", 
+                       "czerwcu", 
+                       "lipcu", 
+                       "sierpniu",
+                       "wrześniu",
+                       "październiu",
+                       "listopadzie",
+                       "grudniu"]
+
+const monthGenitive = ["stycznia", 
+                       "lutego", 
+                       "marca", 
+                       "kwietnia", 
+                       "maja", 
+                       "czerwca", 
+                       "lipca", 
+                       "sierpnia",
+                       "września",
+                       "października",
+                       "listopada",
+                       "grudnia"]
 
 function Hello(){
 
@@ -38,19 +65,21 @@ function Hello(){
             .then(data => setInfo(data));
     }, [])
 
-    const [firstMoney, setFirstMoney] = useState(100)
+    const [firstMoney, setFirstMoney] = useState(1000000000)
     const [firstYear, setFirstYear] = useState(2015)
-    const [firstMonth, setFirstMonth] = useState(1)
-    const [secondYear, setSecondYear] = useState(2015)
-    const [secondMonth, setSecondMonth] = useState(1)
-    const [secondMoney, setSecondMoney]
+    const [firstMonth, setFirstMonth] = useState(2)
+    const [secondYear, setSecondYear] = useState(2020)
+    const [secondMonth, setSecondMonth] = useState(3)
+    const [secondMoney, setSecondMoney] = useState(123)
+    const [inflation, setInflation] = useState(0)
 
     return (
         <div id="calc">
-            <span className="fullrow"><span>100.00 zł</span> <span>w styczniu 2003 r.</span></span>
+            <DateChooser/>
+            <span className="fullrow"><span><input type="text" value={firstMoney}/> zł</span> <span>{firstMonth==1 ? "ze" : "z"} {monthGenitive[firstMonth-1]} {firstYear} r.</span></span>
             <span className="fullrow">jest warte</span>
-            <span className="fullrow"><span>135.54 zł</span> <span>w styczniu 2003 r.</span></span>
-            <span className="fullrow">inflacja wynosi 35.5%</span>
+            <span className="fullrow"><span>{secondMoney} zł</span> <span>w {monthLocative[secondMonth-1]} {secondYear} r.</span></span>
+            <span className="fullrow">inflacja wynosi <strong>{inflation}%</strong></span>
         </div>
     )
 }

@@ -18,3 +18,11 @@ body {
     width: 100%;
     display: inline-block;
 }
+input{
+    font-size: 1.2em;
+    width: 6em;
+    text-align: right;
+}
+select{
+    font-size: 0.9em;
+}
