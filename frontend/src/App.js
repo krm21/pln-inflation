@@ -1,36 +1,28 @@
 import React, { useState, useEffect} from 'react'
 import ReactDOM from 'react-dom'
 import { DateChooser } from './DateChooser'
+import { CurrInput } from './CurrInput'
+import axios from 'axios'
 
-function Converter(){}
+const getLowerYearBound = data => {
+    return Object.keys(data).sort((x, y)=>Number.parseInt(x)-Number.parseInt(y))[0]
+}
 
-const monthLocative = ["styczniu", 
-                       "lutym", 
-                       "marcu", 
-                       "kwietniu", 
-                       "maju", 
-                       "czerwcu", 
-                       "lipcu", 
-                       "sierpniu",
-                       "wrześniu",
-                       "październiu",
-                       "listopadzie",
-                       "grudniu"]
+const getUpperYearBound = data => {
+    return Object.keys(data).sort((x, y)=>Number.parseInt(y)-Number.parseInt(x))[0]
+}
 
-const monthGenitive = ["stycznia", 
-                       "lutego", 
-                       "marca", 
-                       "kwietnia", 
-                       "maja", 
-                       "czerwca", 
-                       "lipca", 
-                       "sierpnia",
-                       "września",
-                       "października",
-                       "listopada",
-                       "grudnia"]
+const getLowerYearfirstMonth = data => {
+    const lowerYear = getLowerYearBound(data)
+    return Object.keys(data[lowerYear]).sort((x, y)=>Number.parseInt(x)-Number.parseInt(y))[0]
+}
 
-function Hello(){
+const getUpperYearLastMonth = data => {
+    const upperYear = getUpperYearBound(data)
+    return Object.keys(data[upperYear]).filter(x=>data[upperYear][x]!==null).sort((x, y)=>Number.parseInt(y)-Number.parseInt(x))[0]
+}
+
+function Calculator(){
 
     const getProduct = (year, month) => {
         let product = 1
@@ -58,33 +50,53 @@ function Hello(){
 
     const [info, setInfo] = useState([]);
 
-    useEffect(() => {
-        let url = 'http://127.0.0.1:5000/time';
-        fetch(url)
-            .then(response => response.json())
-            .then(data => setInfo(data));
+    useEffect(async () => {
+        const result = await axios('http://127.0.0.1:5000/time')
+        const resultJSON = JSON.parse(result.data)
+        setInfo(resultJSON)
+        setLowerBoundDate({
+            year: getLowerYearBound(resultJSON),
+            month: getLowerYearfirstMonth(resultJSON)
+        })
+        setUpperBoundDate({
+            year: getUpperYearBound(resultJSON),
+            month: getUpperYearLastMonth(resultJSON)
+        })
     }, [])
 
-    const [firstMoney, setFirstMoney] = useState(1000000000)
-    const [firstYear, setFirstYear] = useState(2015)
-    const [firstMonth, setFirstMonth] = useState(2)
-    const [secondYear, setSecondYear] = useState(2020)
-    const [secondMonth, setSecondMonth] = useState(3)
+    const [firstMoney, setFirstMoney] = useState(1000)
+    const [lowerBoundDate, setLowerBoundDate] = useState({year: 2000, month: 1})
+    const [upperBoundDate, setUpperBoundDate] = useState({year: 2010, month: 1})
+    const [firstDate, setFirstDate] = useState({year: 2000, month: 1})
+    const [secondDate, setSecondDate] = useState({year: 2010, month: 1})
     const [secondMoney, setSecondMoney] = useState(123)
     const [inflation, setInflation] = useState(0)
 
+
     return (
         <div id="calc">
-            <DateChooser/>
-            <span className="fullrow"><span><input type="text" value={firstMoney}/> zł</span> <span>{firstMonth==1 ? "ze" : "z"} {monthGenitive[firstMonth-1]} {firstYear} r.</span></span>
+            <span className="fullrow"><span><CurrInput value={firstMoney} setValue={setFirstMoney}/> zł</span> <span>{firstDate.month === 1 ? "ze" : "z"}  <DateChooser
+                lowerBound={lowerBoundDate}
+                upperBound={upperBoundDate}
+                date={firstDate}
+                setDate={setFirstDate}
+                mode={"genitive"}
+            /> r.</span></span>
             <span className="fullrow">jest warte</span>
-            <span className="fullrow"><span>{secondMoney} zł</span> <span>w {monthLocative[secondMonth-1]} {secondYear} r.</span></span>
+            <span className="fullrow"><span>{secondMoney} zł</span> <span> w&nbsp;
+            <DateChooser
+                lowerBound={lowerBoundDate}
+                upperBound={upperBoundDate}
+                date={secondDate}
+                setDate={setSecondDate}
+                mode={"locative"}
+            /> r.</span></span>
             <span className="fullrow">inflacja wynosi <strong>{inflation}%</strong></span>
         </div>
     )
 }
 
 ReactDOM.render(
-    <Hello/>,
+    <Calculator/>,
     document.getElementById("app")
 )
